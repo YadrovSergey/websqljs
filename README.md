@@ -16,12 +16,13 @@
 ``` javascript
 
 
+
 var sqlitejs = {};
 
 
 /*
- Открываем БД. Т.к. openDatabase может быть много раз, в разных частях кода, 
- то запомнить в кеше.
+ Открываем БД. Т.к. openDatabase может быть много раз, 
+ в разных частях кода, то запомнить в кеше.
  */
 
 var db = sqlitejs.openDatabase({
@@ -171,9 +172,10 @@ db.find('sport_diary',
     });
 
 
+
 /*
  Вставляем запись в заданную таблицу. Аналогично insert в sql
-
+ Поля created_at, updated_at автоматически заполнятся текущим временем.
  Преобразование из object в sqlite .
 
  - javascript Date  -> integer
@@ -197,6 +199,7 @@ db.insert('sport_diary',
 
 /*
  Обнолвяем запись в заданной таблице. Аналогично update
+ Поле  updated_at автоматически заполнится текущим временем.
  */
 db.update('sport_diary',
     {
