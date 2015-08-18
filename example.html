@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  
+</head>
+<body>
+  
+  <script src="lib/sqllite.js"></script>
+  <script>
+    var db = sqlitejs.openDatabase({
+      name: 'test',
+      version: '1',
+      displayname: 'test',
+      size: 1000000,
+      sqlitePlugin: true
+    });
+
+    var sport_diary = {
+      name: 'sport_diary', 
+      /*
+       Описание полей таблицы
+       name - наимеование колонки
+       type - тип колонки.
+       Возможны следующие варианты:
+       - integer
+       - real
+       - text
+       - date (в sqlite хранится как integer)
+       - json (в sqlite хранится как text)
+
+       Автоматически добавляются следующие колонки
+       id - integer AUTO_INCREMENT - id записи
+       created_at - date - дата и время добавления записи
+       updated_at - date - дата и время добавлении записи
+       */
+      fields: {
+        'id_user': 'integer',
+        'date_of_training': 'date',
+        'training': 'json',
+        'note': 'text'
+      },
+      index: [
+        {fields: ['id_user', 'date_of_training'], unique: true}
+      ]
+    };
+
+
+    db.createTable(sport_diary);
+    /*db.all('ToDo', function(result) {
+      console.log(result);
+    });
+*/
+    db.insert('sport_diary',
+    {
+        id_user: 3,
+        date_of_training: new Date(),
+        training: {some_object: [1,2]},
+        note: 'note'
+    }, function(newId, err){
+
+        /*
+         newId - id вставленой записи
+         */
+
+    });
+
+    
+  </script>
+</body>
+</html>
