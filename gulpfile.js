@@ -36,7 +36,8 @@ gulp.task('test-jasmine', ['build'], function() {
   return gulp.src('./spec/test.js')
     .pipe($.jasminePhantom({
       keepRunner: true,
-      vendor: ['lib/sqlite.js']
+      vendor: ['lib/sqlite.js'],
+      integration: true
     }));
 });
 

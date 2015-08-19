@@ -48,12 +48,12 @@
     };
 
 
-    db.all('sports_diary', function(result) {
-      
+    db.all('sport_diary', function(result) {
+      console.log(result);
     });
 
     db.byId('sport_diary', 1 , function(oResult, err){
-      
+      console.dir(oResult);
     });
 
     db.find('sport_diary',
@@ -65,7 +65,7 @@
         ],
         order: "date_of_training desc, id_user asc"
       }, function(arResult, err) {
-      
+      console.log(arResult);
     });
 
     /*
@@ -74,18 +74,6 @@
     Если нету, то db.insert с заданным ID
     Если есть, то db.update
  */
-    db.save('sport_diary',
-      {
-          id: null,//id может присутсовать или отсуствовать
-          id_user: 6,
-          date_of_training: new Date(),
-          training: {some_object: [1,2,5]},
-          note: 'note'
-      }
-      , function(newId, err){
-
-        console.log(newId);
-    });
 
     
   </script>

@@ -60,6 +60,31 @@ Websql.prototype = {
     return val;
   },
 
+  _convertRows: function(result) {
+    var rows = [];
+    if (result && result.rows.length!==0) {
+      for(var i = 0; i < result.rows.length; i++) {
+        var item = result.rows.item(i);
+
+        for (var key in item) {
+          if (item.hasOwnProperty(key)) {
+            if (isString(item[key])) {
+              item[key] = tryJSON(item[key]);
+            } else if (isNumber(item[key])) {
+              item[key] = tryDate(item[key]);
+            }
+          }
+        }
+
+        rows.push(item);
+      }
+      return rows;
+    } else {
+      return null;
+    }
+
+  },
+
   query: function(sql, callback) {
     this._db.transaction(function(tx) {
       tx.executeSql(sql, [], function(tx, result) {
@@ -103,45 +128,25 @@ Websql.prototype = {
   },
 
   all: function(table, callback) {
+    var self = this;
     this.query('SELECT * FROM '+table, function(tx, result) {
-      var rows = [];
-      if (result && result.rows.length!==0) {
-        for(var i = 0; i < result.rows.length; i++) {
-          var item = result.rows.item(i);
-
-          for (var key in item) {
-            if (item.hasOwnProperty(key)) {
-              if (isString(item[key])) {
-                item[key] = tryJSON(item[key]);
-              } else if (isNumber(item[key])) {
-                item[key] = tryDate(item[key]);
-              }
-            }
-          }
-
-          rows.push(item);
-        }
-      }
-
+      var rows = self._convertRows(result);
       if (isFunction(callback)) callback(rows);
     });
   },
 
   byId: function(table, id, callback) {
-    var query = 'SELECT * FROM '+table+' WHERE id='+id;
+    var query = 'SELECT * FROM '+table+' WHERE id='+id,
+        self = this;
     this.query(query, function(tx, res, error) {
-      var result;
-      if (res.rows.length===0) {
-        result = null;
-      } else {
-        result = res.rows[0];
-      }
-      if (isFunction(callback)) callback(result, error);
+      var result = self._convertRows(res);
+      if (isFunction(callback)) callback(result[0], error);
     });
   },
 
   find: function(table, cond, callback) {
-    var query = 'SELECT * FROM '+table;
+    var query = 'SELECT * FROM '+table,
+        self = this;
     if (cond.where) {
       query += ' WHERE';
       cond.where.map(function(where) {
@@ -159,10 +164,7 @@ Websql.prototype = {
     }
 
     this.query(query, function(tx, res, error) {
-      var result = [];
-      for (var i = 0; i < res.rows.length; i++) {
-        result.push(res.rows[i]);
-      }
+      var result = self._convertRows(res);
       if (isFunction(callback)) callback(result, error);
     });
   },
