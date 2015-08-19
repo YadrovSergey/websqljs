@@ -48,22 +48,12 @@
     };
 
 
-    db.createTable(sport_diary);
-    /*db.all('ToDo', function(result) {
+    db.all('sport_diary', function(result) {
       console.log(result);
     });
-*/
-    db.insert('sport_diary',
-    {
-        id_user: 3,
-        date_of_training: new Date(),
-        training: {some_object: [1,2]},
-        note: 'note'
-    }, function(newId, err){
 
-         console.log(newId);
-         console.log(err);
-
+    db.byId('sport_diary', 1 , function(oResult, err){
+      console.log(oResult);
     });
 
     

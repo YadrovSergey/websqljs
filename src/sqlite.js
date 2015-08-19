@@ -111,6 +111,14 @@ Websql.prototype = {
     });
   },
 
+  byId: function(table, id, callback) {
+    var query = 'SELECT * FROM '+table+' WHERE id='+id;
+    this.query(query, function(tx, res, error) {
+      var result = res ? res.rows[0] : null;
+      if (isFunction(callback)) callback(result, error);
+    });
+  },
+
   insert: function(table, data, callback) {
     //if (!isArray(data)) data = [data];
     var created = new Date().getTime(),
