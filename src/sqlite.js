@@ -105,7 +105,7 @@ Websql.prototype = {
   all: function(table, callback) {
     this.query('SELECT * FROM '+table, function(tx, result) {
       var rows = [];
-      if (result.rows.length!==0) {
+      if (result && result.rows.length!==0) {
         for(var i = 0; i < result.rows.length; i++) {
           var item = result.rows.item(i);
 
