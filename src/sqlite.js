@@ -42,6 +42,7 @@ function tryDate(val) {
 
 var Websql = function(config) {
   this._db = openDatabase(config.name, config.version, config.displayname, config.size);
+  this.debug = config.debug || false;
 };
 
 Websql.prototype = {
@@ -86,7 +87,9 @@ Websql.prototype = {
   },
 
   query: function(sql, callback) {
+    var debug = this.debug;
     this._db.transaction(function(tx) {
+      if (debug) console.log('qeury: '+sql);
       tx.executeSql(sql, [], function(tx, result) {
         if (isFunction(callback)) callback(tx, result);
       }, function(tx, error) {
