@@ -28,8 +28,16 @@ gulp.task('serve', function() {
     }));
 });
 
-gulp.task('watch', function() {
-  gulp.watch('./src/sqlite.js', ['build']);
+gulp.task('watch', ['test-jasmine'], function() {
+  gulp.watch('./src/sqlite.js', ['test-jasmine']);
 });
 
-gulp.task('default', ['build', 'watch', 'serve']);
+gulp.task('test-jasmine', ['build'], function() {
+  return gulp.src('./spec/test.js')
+    .pipe($.jasminePhantom({
+      keepRunner: true,
+      vendor: ['lib/sqlite.js']
+    }));
+});
+
+gulp.task('default', ['watch', 'serve']);

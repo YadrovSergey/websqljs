@@ -105,20 +105,22 @@ Websql.prototype = {
   all: function(table, callback) {
     this.query('SELECT * FROM '+table, function(tx, result) {
       var rows = [];
-      for(var i = 0; i < result.rows.length; i++) {
-        var item = result.rows.item(i);
+      if (result.rows.length!==0) {
+        for(var i = 0; i < result.rows.length; i++) {
+          var item = result.rows.item(i);
 
-        for (var key in item) {
-          if (item.hasOwnProperty(key)) {
-            if (isString(item[key])) {
-              item[key] = tryJSON(item[key]);
-            } else if (isNumber(item[key])) {
-              item[key] = tryDate(item[key]);
+          for (var key in item) {
+            if (item.hasOwnProperty(key)) {
+              if (isString(item[key])) {
+                item[key] = tryJSON(item[key]);
+              } else if (isNumber(item[key])) {
+                item[key] = tryDate(item[key]);
+              }
             }
           }
-        }
 
-        rows.push(item);
+          rows.push(item);
+        }
       }
 
       if (isFunction(callback)) callback(rows);
