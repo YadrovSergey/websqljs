@@ -1,12 +1,3 @@
-;(function(root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define([], factory);
-  } else if (typeof exports === 'object') {
-    module.exports = factory();
-  } else {
-    root.sqlitejs = factory();
-  }
-}(this, function() {
 function isString(val) {
   return typeof(val)==='string';
 }
@@ -21,6 +12,10 @@ function isFunction(val) {
 
 function isArray(val) {
   return Array.isArray(val);
+}
+
+function isObject(val) {
+  return typeof(val)==='object';
 }
 
 function tryJSON(val) {
@@ -55,13 +50,16 @@ Websql.prototype = {
     this._db.transaction(function(tx) {
       tx.executeSql(sql, [], function(tx, result) {
         if (isFunction(callback)) callback(tx, result);
+      }, function(tx, error) {
+        if (isFunction(callback)) callback(tx, null, error);
       });
     });
   },
 
   createTable: function(struct) {
-    var query = 'CREATE TABLE '+struct.name+' (',
-        fields = ['id INTEGER AUTO_INCREMENT', 'created_at REAL', 'updated_at REAL'];
+    var self = this,
+        query = 'CREATE TABLE '+struct.name+' (',
+        fields = ['id INTEGER PRIMARY KEY AUTOINCREMENT', 'created_at REAL', 'updated_at REAL'];
 
     for (var field in struct.fields) {
       if (struct.fields.hasOwnProperty(field)) {
@@ -83,8 +81,8 @@ Websql.prototype = {
           if (key!=='fields')
             indexes.push(key);
         });
-        q = 'CREATE '+indexes.join(' ')+' INDEX '+q;
-        console.log(q);
+        q = 'CREATE '+indexes.join(' ').toUpperCase()+' INDEX '+q;
+        self.query(q);
       });
     });
 
@@ -114,8 +112,31 @@ Websql.prototype = {
   },
 
   insert: function(table, data, callback) {
-    if (!isArray(data)) data = [data];
-    var created = new Date().getTime();
+    //if (!isArray(data)) data = [data];
+    var created = new Date().getTime(),
+        keys = ['created_at', 'updated_at'].concat(Object.keys(data)),
+        vals = [ created, created ];
+
+    keys.map(function(key) {
+      var val = data[key];
+      if (!val) return;
+      if (isObject(val)) {
+        if (val instanceof(Date)) {
+          val = val.getTime();
+        } else {
+          val = JSON.stringify(val);
+        }
+      }
+
+      if (isString(val)) val = "'"+val+"'";
+      vals.push(val);
+    });
+
+    var query = 'INSERT INTO '+table+' ('+keys.join(', ')+') VALUES ('+vals.join(', ')+')';
+    this.query(query, function(tx, res, error) {
+      var id = res ? res.insertId : null;
+      if (isFunction(callback)) callback(id, error);
+    });
   }
 
 };
@@ -132,5 +153,3 @@ var sqlitejs = {
     return this._cache[config.name];
   }
 };
-return sqlitejs;
-}));

@@ -2,7 +2,7 @@ var gulp = require('gulp'),
     $ = require('gulp-load-plugins')();
 
 gulp.task('build', function() {
-  return gulp.src('./src/sqllite.js')
+  return gulp.src('./src/sqlite.js')
     .pipe($.plumber())
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -29,7 +29,7 @@ gulp.task('serve', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('./src/sqllite.js', ['build']);
+  gulp.watch('./src/sqlite.js', ['build']);
 });
 
 gulp.task('default', ['build', 'watch', 'serve']);

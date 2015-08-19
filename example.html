@@ -8,7 +8,7 @@
 </head>
 <body>
   
-  <script src="lib/sqllite.js"></script>
+  <script src="lib/sqlite.js"></script>
   <script>
     var db = sqlitejs.openDatabase({
       name: 'test',
@@ -61,9 +61,8 @@
         note: 'note'
     }, function(newId, err){
 
-        /*
-         newId - id вставленой записи
-         */
+         console.log(newId);
+         console.log(err);
 
     });
 
