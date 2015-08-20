@@ -41,7 +41,11 @@ function tryDate(val) {
 }
 
 var Websql = function(config) {
-  this._db = openDatabase(config.name, config.version, config.displayname, config.size);
+  if (config.sqlitePlugin) {
+    this._db = sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
+  } else {
+    this._db = openDatabase(config.name, config.version, config.displayname, config.size);
+  }
   this.debug = config.debug || false;
 };
 
@@ -113,7 +117,7 @@ Websql.prototype = {
     }
 
     query += (fields.join(', ')) + ')';
-
+    
     this.query(query, function(tx, result) {
       struct.index.map(function(index) {
         var keys = Object.keys(index),
@@ -128,14 +132,18 @@ Websql.prototype = {
       });
     });
 
+    return query;
   },
 
   all: function(table, callback) {
-    var self = this;
-    this.query('SELECT * FROM '+table, function(tx, result) {
+    var self = this,
+        query = 'SELECT * FROM '+table;
+    this.query(query, function(tx, result) {
       var rows = self._convertRows(result);
       if (isFunction(callback)) callback(rows);
     });
+
+    return query;
   },
 
   byId: function(table, id, callback) {
@@ -143,8 +151,11 @@ Websql.prototype = {
         self = this;
     this.query(query, function(tx, res, error) {
       var result = self._convertRows(res);
-      if (isFunction(callback)) callback(result[0], error);
+      result = result ? result[0] : null;
+      if (isFunction(callback)) callback(result, error);
     });
+
+    return query;
   },
 
   find: function(table, cond, callback) {
@@ -170,6 +181,8 @@ Websql.prototype = {
       var result = self._convertRows(res);
       if (isFunction(callback)) callback(result, error);
     });
+
+    return query;
   },
 
   insert: function(table, data, callback) {
@@ -197,6 +210,8 @@ Websql.prototype = {
       var id = res ? res.insertId : null;
       if (isFunction(callback)) callback(id, error);
     });
+
+    return query;
   },
 
   update: function(table, data, callback) {
@@ -220,6 +235,7 @@ Websql.prototype = {
       if (isFunction(callback)) callback(error);
     });
 
+    return query;
   },
 
   save: function(table, data, callback) {
@@ -229,18 +245,18 @@ Websql.prototype = {
     if (id) {
       this.byId(table, id, function(result, error) {
         if (!result) {
-          self.insert(table, data, function(id, error) {
+          return self.insert(table, data, function(id, error) {
             if (isFunction(callback)) callback(id, error);
           });
         } else {
-          self.update(table, data, function(error) {
+          return self.update(table, data, function(error) {
             if (isFunction(callback))
               if (error) callback(null, error); else callback(id);
           });
         }
       });
     } else {
-      self.insert(table, data, function(id, error) {
+      return self.insert(table, data, function(id, error) {
         if (isFunction(callback)) callback(id, error);
       });
     }
