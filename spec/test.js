@@ -74,4 +74,17 @@ describe('Query tests', function() {
       );
   });
 
+  it('Save without id', function() {
+    var data = {
+      id_user: 3,
+      date_of_training: new Date(),
+      training: {some_object: [1,2,3]},
+      note: 'note'
+    };
+
+    expect(db.save('test_table', data)).toBe(
+        'INSERT INTO test_table (created_at, updated_at, id_user, date_of_training, training, note) VALUES ('+data.date_of_training.getTime()+', '+data.date_of_training.getTime()+', 3, '+data.date_of_training.getTime()+', \'{"some_object":[1,2,3]}\', \'note\')'
+      );
+  });
+
 });
