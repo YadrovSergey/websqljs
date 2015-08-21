@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  
+</head>
+<body>
+  
+  <script src="lib/sqlite.js"></script>
+  <script>
+    var db = sqlitejs.openDatabase({
+      name: 'test',
+      version: '1',
+      displayname: 'test',
+      size: 1000000,
+      sqlitePlugin: false,
+      debug: true
+    });
+
+    var sport_diary = {
+      name: 'sport_diary', 
+      /*
+       Описание полей таблицы
+       name - наимеование колонки
+       type - тип колонки.
+       Возможны следующие варианты:
+       - integer
+       - real
+       - text
+       - date (в sqlite хранится как integer)
+       - json (в sqlite хранится как text)
+
+       Автоматически добавляются следующие колонки
+       id - integer AUTO_INCREMENT - id записи
+       created_at - date - дата и время добавления записи
+       updated_at - date - дата и время добавлении записи
+       */
+      fields: {
+        'id_user': 'integer',
+        'date_of_training': 'date',
+        'training': 'json',
+        'note': 'text',
+        'new_field': 'integer'
+      },
+      index: [
+        {fields: ['id_user', 'date_of_training'], unique: true}
+      ]
+    };
+
+    db.dropTable('ToDo');
+    db.deleteById('sport_diary', 20);
+
+    /*db.createTable(sport_diary);
+
+    db.all('sport_diary', function(result) {
+      console.log(result);
+    });
+
+    db.byId('sport_diary', 1 , function(oResult, err){
+      console.dir(oResult);
+    });
+
+    db.find('sport_diary',
+      {
+        where: [
+          {field: 'id_user', op:'=', value: 3},
+          'and',
+          {field: 'date_of_training', op:'>=', value: 5000}
+        ],
+        order: "date_of_training desc, id_user asc"
+      }, function(arResult, err) {
+      console.log(arResult);
+    });*/
+
+    /*
+ Если 'объект с данными' не имеет id, или id = 0,null, то будет выполнен db.insert
+ Если 'объект с данными' имеет id, то производится проверка на его существование в таблице.
+    Если нету, то db.insert с заданным ID
+    Если есть, то db.update
+ */
+
+    
+  </script>
+</body>
+</html>
