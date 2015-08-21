@@ -41,13 +41,18 @@
         'id_user': 'integer',
         'date_of_training': 'date',
         'training': 'json',
-        'note': 'text'
+        'note': 'text',
+        'new_field': 'integer'
       },
       index: [
         {fields: ['id_user', 'date_of_training'], unique: true}
       ]
     };
 
+    db.dropTable('ToDo');
+    db.deleteById('sport_diary', 20);
+
+    /*db.createTable(sport_diary);
 
     db.all('sport_diary', function(result) {
       console.log(result);
@@ -67,7 +72,7 @@
         order: "date_of_training desc, id_user asc"
       }, function(arResult, err) {
       console.log(arResult);
-    });
+    });*/
 
     /*
  Если 'объект с данными' не имеет id, или id = 0,null, то будет выполнен db.insert

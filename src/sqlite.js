@@ -118,7 +118,23 @@ Websql.prototype = {
 
     query += (fields.join(', ')) + ')';
     
-    this.query(query, function(tx, result) {
+    this.query(query, function(tx, result, error) {
+      // if table already exists
+      if (error && error.code===5) {
+        self.query('SELECT * FROM '+struct.name+' LIMIT 1', function(tx, res, error) {
+          if (!res || res.rows.length===0) return;
+          var rows = Object.keys(res.rows[0]),
+              newRows = Object.keys(struct.fields),
+              q = 'ALTER TABLE '+struct.name+' ADD COLUMN ';
+
+          newRows.map(function(row) {
+            if (rows.indexOf(row)!==-1) return;
+            self.query(q+row+' '+struct.fields[row]);
+          });
+
+        });
+      }
+
       struct.index.map(function(index) {
         var keys = Object.keys(index),
             indexes = [],
@@ -130,6 +146,7 @@ Websql.prototype = {
         q = 'CREATE '+indexes.join(' ').toUpperCase()+' INDEX '+q;
         self.query(q);
       });
+      
     });
 
     return query;
@@ -260,6 +277,20 @@ Websql.prototype = {
         if (isFunction(callback)) callback(id, error);
       });
     }
+  },
+
+  dropTable: function(table) {
+    var query = 'DROP TABLE '+table;
+    this.query(query, function(tx, res, error) {
+
+    });
+  },
+
+  deleteById: function(table, id) {
+    var query = 'DELETE FROM '+table+' WHERE id='+id;
+    this.query(query, function(tx, res, error) {
+      
+    });
   }
 
 };
