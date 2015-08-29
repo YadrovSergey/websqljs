@@ -1,3 +1,34 @@
+;(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['lodash'], factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('lodash'));
+  } else {
+    root.sqlitejs = factory(root.lodash);
+  }
+}(this, function(lodash) {
+function tryJSON(val) {
+  var json;
+
+  try {
+    json = JSON.parse(val);
+  } catch(e) {
+    json = val;
+  }
+  return json;
+}
+
+function tryDate(val) {
+  var date;
+  date = new Date(val);
+
+  if (date.getYear()===70 && date.getMonth()===0 && date.getDate()===1) {
+    date = val;
+  }
+
+  return date;
+}
+
 var Websql = function(config) {
   if (config.sqlitePlugin) {
     this._db = window.sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
@@ -27,7 +58,7 @@ Websql.prototype = {
 
   _convertRows: function(table, result) {
     var rows = [];
-    if (result && result.rows && result.rows.length!==0) {
+    if (result && result.rows.length!==0) {
       for(var i = 0; i < result.rows.length; i++) {
         var item = result.rows.item(i);
 
@@ -85,7 +116,7 @@ Websql.prototype = {
       if (error && error.code===5) {
         self.query('SELECT * FROM '+struct.name+' LIMIT 1', function(tx, res, error) {
           if (!res || res.rows.length===0) return;
-          var rows = Object.keys(res.rows.item(0)),
+          var rows = Object.keys(res.rows[0]),
               newRows = Object.keys(struct.fields),
               q = 'ALTER TABLE '+struct.name+' ADD COLUMN ';
 
@@ -293,3 +324,5 @@ var sqlitejs = {
     return this._cache[config.name];
   }
 };
+return sqlitejs;
+}));
