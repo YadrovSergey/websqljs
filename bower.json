@@ -1,0 +1,20 @@
+{
+  "name": "websqljs",
+  "version": "0.0.0",
+  "homepage": "https://github.com/desker/websqljs",
+  "authors": [
+    "Sergey Karinskiy <karinsky.name@gmail.com>"
+  ],
+  "main": "lib/sqlite.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "~3.10.1"
+  }
+}

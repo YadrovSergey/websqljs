@@ -8,6 +8,7 @@
 </head>
 <body>
   
+  <script src="bower_components/lodash/lodash.js"></script>
   <script src="lib/sqlite.js"></script>
   <script>
     var db = sqlitejs.openDatabase({
@@ -49,18 +50,33 @@
       ]
     };
 
-    db.dropTable('ToDo');
-    db.deleteById('sport_diary', 20);
+    /*db.dropTable('ToDo');
+    db.deleteById('sport_diary', 20);*/
 
-    /*db.createTable(sport_diary);
+    db.createTable(sport_diary);
 
-    db.all('sport_diary', function(result) {
+    /*db.all('sport_diary', function(result) {
       console.log(result);
     });
 
     db.byId('sport_diary', 1 , function(oResult, err){
       console.dir(oResult);
-    });
+    });*/
+
+/*   db.insert('sport_diary',
+    {
+        id_user: 3,
+        date_of_training: new Date(),
+        training: {some_object: [1,2]},
+        note: 'note'
+    }
+    , function(newId, err){
+
+        /*
+         newId - id вставленой записи
+         
+
+    });*/
 
     db.find('sport_diary',
       {
@@ -69,10 +85,11 @@
           'and',
           {field: 'date_of_training', op:'>=', value: 5000}
         ],
+        row: true,
         order: "date_of_training desc, id_user asc"
       }, function(arResult, err) {
       console.log(arResult);
-    });*/
+    });
 
     /*
  Если 'объект с данными' не имеет id, или id = 0,null, то будет выполнен db.insert
