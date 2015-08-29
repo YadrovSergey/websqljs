@@ -84,8 +84,7 @@
           {field: 'id_user', op:'=', value: 3},
           'and',
           {field: 'date_of_training', op:'>=', value: 5000}
-        ],
-        row: true,
+        ],  
         order: "date_of_training desc, id_user asc"
       }, function(arResult, err) {
       console.log(arResult);

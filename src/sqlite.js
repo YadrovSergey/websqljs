@@ -1,25 +1,3 @@
-function tryJSON(val) {
-  var json;
-
-  try {
-    json = JSON.parse(val);
-  } catch(e) {
-    json = val;
-  }
-  return json;
-}
-
-function tryDate(val) {
-  var date;
-  date = new Date(val);
-
-  if (date.getYear()===70 && date.getMonth()===0 && date.getDate()===1) {
-    date = val;
-  }
-
-  return date;
-}
-
 var Websql = function(config) {
   if (config.sqlitePlugin) {
     this._db = window.sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
@@ -30,6 +8,8 @@ var Websql = function(config) {
 };
 
 Websql.prototype = {
+
+  _cache: {},
 
   _cellData: function(val) {
     if (!val) return;
@@ -45,7 +25,7 @@ Websql.prototype = {
     return val;
   },
 
-  _convertRows: function(result) {
+  _convertRows: function(table, result) {
     var rows = [];
     if (result && result.rows.length!==0) {
       for(var i = 0; i < result.rows.length; i++) {
@@ -53,10 +33,10 @@ Websql.prototype = {
 
         for (var key in item) {
           if (item.hasOwnProperty(key)) {
-            if (_.isString(item[key])) {
-              item[key] = tryJSON(item[key]);
-            } else if (_.isNumber(item[key])) {
-              item[key] = tryDate(item[key]);
+            if (this._cache[table+'_'+key]==='json') {
+              item[key] = JSON.parse(item[key]);
+            } else if (this._cache[table+'_'+key]==='date') {
+              item[key] = new Date(item[key]);
             }
           }
         }
@@ -90,9 +70,11 @@ Websql.prototype = {
     for (var field in struct.fields) {
       if (struct.fields.hasOwnProperty(field)) {
         var type = struct.fields[field];
+        this._cache[struct.name+'_'+field] = type;
         if (type==='json') type = 'text';
         else if (type==='date') type = 'real';
         fields.push(field+' '+type.toUpperCase());
+
       }
     }
 
@@ -138,7 +120,7 @@ Websql.prototype = {
     var self = this,
         query = 'SELECT * FROM '+table;
     this.query(query, function(tx, result) {
-      var rows = self._convertRows(result);
+      var rows = self._convertRows(table, result);
       if (_.isFunction(callback)) callback(rows);
     });
 
@@ -149,7 +131,7 @@ Websql.prototype = {
     var query = 'SELECT * FROM '+table+' WHERE id='+id,
         self = this;
     this.query(query, function(tx, res, error) {
-      var result = self._convertRows(res);
+      var result = self._convertRows(table, res);
       result = result ? result[0] : null;
       if (_.isFunction(callback)) callback(result, error);
     });
@@ -192,7 +174,7 @@ Websql.prototype = {
     this.query(query, function(tx, res, error) {
       var result = [];
       if (cond.row!==true)
-        result = self._convertRows(res);
+        result = self._convertRows(table, res);
       else {
         if (res && res.rows.length!==0) {
           for(var i = 0; i < res.rows.length; i++) {
