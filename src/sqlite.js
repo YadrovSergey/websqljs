@@ -272,8 +272,7 @@ Websql.prototype = {
         } else {
           return self.update(table, data, function(error) {
             if (_.isFunction(callback))
-              if (error) callback(null, error);
-              else callback(id, false);
+              callback(id, error, false);
           });
         }
       });
