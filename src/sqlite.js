@@ -1,23 +1,3 @@
-function isString(val) {
-  return typeof(val)==='string';
-}
-
-function isNumber(val) {
-  return typeof(val)==='number';
-}
-
-function isFunction(val) {
-  return typeof(val)==='function';
-}
-
-function isArray(val) {
-  return Array.isArray(val);
-}
-
-function isObject(val) {
-  return typeof(val)==='object';
-}
-
 function tryJSON(val) {
   var json;
 
@@ -42,7 +22,7 @@ function tryDate(val) {
 
 var Websql = function(config) {
   if (config.sqlitePlugin) {
-    this._db = sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
+    this._db = window.sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
   } else {
     this._db = openDatabase(config.name, config.version, config.displayname, config.size);
   }
@@ -53,7 +33,7 @@ Websql.prototype = {
 
   _cellData: function(val) {
     if (!val) return;
-    if (isObject(val)) {
+    if (_.isObject(val)) {
       if (val instanceof(Date)) {
         val = val.getTime();
       } else {
@@ -61,7 +41,7 @@ Websql.prototype = {
       }
     }
 
-    if (isString(val)) val = "'"+val+"'";
+    if (_.isString(val)) val = "'"+val+"'";
     return val;
   },
 
@@ -73,9 +53,9 @@ Websql.prototype = {
 
         for (var key in item) {
           if (item.hasOwnProperty(key)) {
-            if (isString(item[key])) {
+            if (_.isString(item[key])) {
               item[key] = tryJSON(item[key]);
-            } else if (isNumber(item[key])) {
+            } else if (_.isNumber(item[key])) {
               item[key] = tryDate(item[key]);
             }
           }
@@ -95,14 +75,14 @@ Websql.prototype = {
     this._db.transaction(function(tx) {
       if (debug) console.log('qeury: '+sql);
       tx.executeSql(sql, [], function(tx, result) {
-        if (isFunction(callback)) callback(tx, result);
+        if (_.isFunction(callback)) callback(tx, result);
       }, function(tx, error) {
-        if (isFunction(callback)) callback(tx, null, error);
+        if (_.isFunction(callback)) callback(tx, null, error);
       });
     });
   },
 
-  createTable: function(struct) {
+  createTable: function(struct, callback) {
     var self = this,
         query = 'CREATE TABLE '+struct.name+' (',
         fields = ['id INTEGER PRIMARY KEY AUTOINCREMENT', 'created_at REAL', 'updated_at REAL'];
@@ -135,6 +115,8 @@ Websql.prototype = {
         });
       }
 
+      if (_.isFunction(callback)) callback(tx, result, error);
+
       struct.index.map(function(index) {
         var keys = Object.keys(index),
             indexes = [],
@@ -143,7 +125,7 @@ Websql.prototype = {
           if (key!=='fields')
             indexes.push(key);
         });
-        q = 'CREATE '+indexes.join(' ').toUpperCase()+' INDEX '+q;
+        q = 'CREATE '+indexes.join(' ').toUpperCase()+' INDEX IF NOT EXISTS '+q;
         self.query(q);
       });
       
@@ -157,7 +139,7 @@ Websql.prototype = {
         query = 'SELECT * FROM '+table;
     this.query(query, function(tx, result) {
       var rows = self._convertRows(result);
-      if (isFunction(callback)) callback(rows);
+      if (_.isFunction(callback)) callback(rows);
     });
 
     return query;
@@ -169,20 +151,29 @@ Websql.prototype = {
     this.query(query, function(tx, res, error) {
       var result = self._convertRows(res);
       result = result ? result[0] : null;
-      if (isFunction(callback)) callback(result, error);
+      if (_.isFunction(callback)) callback(result, error);
     });
 
     return query;
   },
 
   find: function(table, cond, callback) {
-    var query = 'SELECT * FROM '+table,
+    var query = 'SELECT ',
         self = this;
+
+    if (cond.select) {
+      query += cond.select.join(', ');
+    } else {
+      query += '*';
+    }
+
+    query += ' FROM '+table;
+
     if (cond.where) {
       query += ' WHERE';
       cond.where.map(function(where) {
-        if (isObject(where)) {
-          var value = isString(where.value) ? "'"+where.value+"'" : where.value;
+        if (_.isObject(where)) {
+          var value = _.isString(where.value) ? "'"+where.value+"'" : where.value;
           query += ' '+where.field + where.op + value;
         } else {
           query += ' '+where;
@@ -194,16 +185,29 @@ Websql.prototype = {
       query += ' ORDER BY '+cond.order;
     }
 
+    if (cond.limit) {
+      query += ' LIMIT '+cond.limit;
+    }
+
     this.query(query, function(tx, res, error) {
-      var result = self._convertRows(res);
-      if (isFunction(callback)) callback(result, error);
+      var result = [];
+      if (cond.row!==true)
+        result = self._convertRows(res);
+      else {
+        if (res && res.rows.length!==0) {
+          for(var i = 0; i < res.rows.length; i++) {
+            result.push(res.rows.item(i));
+          }
+        }
+      }
+      if (_.isFunction(callback)) callback(result, error);
     });
 
     return query;
   },
 
   insert: function(table, data, callback) {
-    //if (!isArray(data)) data = [data];
+    //if (!_.isArray(data)) data = [data];
     var defaultKeys = Object.keys(data),
         keys = [];
 
@@ -225,7 +229,7 @@ Websql.prototype = {
     var query = 'INSERT INTO '+table+' ('+keys.join(', ')+') VALUES ('+vals.join(', ')+')';
     this.query(query, function(tx, res, error) {
       var id = res ? res.insertId : null;
-      if (isFunction(callback)) callback(id, error);
+      if (_.isFunction(callback)) callback(id, error);
     });
 
     return query;
@@ -249,7 +253,7 @@ Websql.prototype = {
 
     var query = 'UPDATE '+table+' SET '+set.join(', ')+' WHERE '+where;
     this.query(query, function(tx, res, error) {
-      if (isFunction(callback)) callback(error);
+      if (_.isFunction(callback)) callback(error);
     });
 
     return query;
@@ -263,18 +267,19 @@ Websql.prototype = {
       this.byId(table, id, function(result, error) {
         if (!result) {
           return self.insert(table, data, function(id, error) {
-            if (isFunction(callback)) callback(id, error);
+            if (_.isFunction(callback)) callback(id, error, true);
           });
         } else {
           return self.update(table, data, function(error) {
-            if (isFunction(callback))
-              if (error) callback(null, error); else callback(id);
+            if (_.isFunction(callback))
+              if (error) callback(null, error);
+              else callback(id, false);
           });
         }
       });
     } else {
       return self.insert(table, data, function(id, error) {
-        if (isFunction(callback)) callback(id, error);
+        if (_.isFunction(callback)) callback(id, error, true);
       });
     }
   },

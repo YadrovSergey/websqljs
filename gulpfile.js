@@ -7,6 +7,17 @@ gulp.task('build', function() {
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.umd({
+      dependencies: function(file) {
+        return [
+          {
+            name: 'lodash',
+            amd: 'lodash',
+            cjs: 'lodash',
+            global: 'lodash',
+            param: 'lodash'
+          }
+        ]
+      },
       exports: function(file) {
         return 'sqlitejs';
       },
