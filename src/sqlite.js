@@ -134,9 +134,8 @@ Websql.prototype = {
                         });
 
                     }else{
-//todo _.keys(  Object.keys(
-                        var rows = Object.keys(res.rows.item(0)),
-                            newRows = Object.keys(oStructure.fields),
+                        var rows = _.keys(res.rows.item(0)),
+                            newRows = _.keys(oStructure.fields),
                             q = 'ALTER TABLE '+oStructure.name+' ADD COLUMN ';
 
                         var arQueries = [];
@@ -174,7 +173,7 @@ Websql.prototype = {
 
 
             oStructure.index.map(function(index) {
-                var keys = Object.keys(index),
+                var keys = _.keys(index),
                     indexes = [],
                     q = index.fields.join('')+' ON '+oStructure.name+' ('+index.fields.join(', ')+')';
                 keys.map(function(key) {
@@ -296,7 +295,7 @@ Websql.prototype = {
 
     _queryInsert: function(table, data) {
         //if (!_.isArray(data)) data = [data];
-        var defaultKeys = Object.keys(data),
+        var defaultKeys = _.keys(data),
             keys = [];
 
         defaultKeys.map(function(key) {
