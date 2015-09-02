@@ -313,6 +313,13 @@ describe('data tests', function() {
 
         Object1['id'] = Object1Id;
         Object1['id_user'] = 6;
+
+        //db.query('SELECT * FROM sqlite_master', function(tx, result, error) {
+        //    result.rows
+        //    console.log(tx, result, error);
+        //});
+
+
         db.save(tableName, Object1, function(arResult){
 
             var find = {
