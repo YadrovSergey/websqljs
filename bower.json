@@ -1,9 +1,9 @@
 {
   "name": "websqljs",
   "version": "0.0.0",
-  "homepage": "https://github.com/desker/websqljs",
+  "homepage": "https://github.com/YadrovSergey/websqljs",
   "authors": [
-    "Sergey Karinskiy <karinsky.name@gmail.com>"
+    "Yadrov Sergey <yadrov_sergey@mail.ru>"
   ],
   "main": "lib/sqlite.js",
   "license": "MIT",
@@ -16,5 +16,8 @@
   ],
   "dependencies": {
     "lodash": "~3.10.1"
+  },
+  "devDependencies": {
+    "jasmine-core": "jasmine#~2.3.4"
   }
 }

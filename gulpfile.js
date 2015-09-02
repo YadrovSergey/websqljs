@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     $ = require('gulp-load-plugins')();
 
 gulp.task('build', function() {
+    console.log('--build');
   return gulp.src('./src/sqlite.js')
     .pipe($.plumber())
     .pipe($.jshint())
@@ -31,25 +32,26 @@ gulp.task('build', function() {
     .pipe(gulp.dest('./lib'));
 });
 
-gulp.task('serve', function() {
+gulp.task('server', function() {
   gulp.src('./')
     .pipe($.webserver({
+      port: 8095,
       livereload: true,
       directoryListing: true
     }));
 });
 
-gulp.task('watch', ['build'], function() {
-  gulp.watch('./src/sqlite.js', ['build']);
+gulp.task('watch', function() {
+    gulp.watch(['src/sqlite.js'], ['build']);
+    //gulp.watch(['src/sqlite.js'], function(files) {
+    //    //runSequence('build', function(){
+    //    //    console.log('build');
+    //    //    done();
+    //    //});
+    //});
+
+  //gulp.watch('./src/sqlite.js', ['build']);
 });
 
-/*gulp.task('test-jasmine', ['build'], function() {
-  return gulp.src('./spec/test.js')
-    .pipe($.jasminePhantom({
-      keepRunner: true,
-      vendor: ['lib/sqlite.js'],
-      integration: true
-    }));
-});*/
 
-gulp.task('default', ['watch', 'serve']);
+gulp.task('default', ['watch', 'server']);

@@ -18,7 +18,6 @@
   "homepage": "https://github.com/desker/websqljs",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-jasmine-phantom": "^2.0.1",
     "gulp-jshint": "^1.11.2",
     "gulp-load-plugins": "^1.0.0-rc.1",
     "gulp-plumber": "^1.0.1",

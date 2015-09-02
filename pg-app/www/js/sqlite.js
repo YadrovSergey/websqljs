@@ -42,7 +42,7 @@ Websql.prototype = {
 
   _cache: {},
 
-  _cellData: function(val) {
+  _toWebSQLValue: function(val) {
     if (!val) return;
     if (_.isObject(val)) {
       if (val instanceof(Date)) {
@@ -56,7 +56,7 @@ Websql.prototype = {
     return val;
   },
 
-  _convertRows: function(table, result) {
+  _fromWebSqlToJsValue: function(table, result) {
     var rows = [];
     if (result && result.rows.length!==0) {
       for(var i = 0; i < result.rows.length; i++) {
@@ -151,7 +151,7 @@ Websql.prototype = {
     var self = this,
         query = 'SELECT * FROM '+table;
     this.query(query, function(tx, result) {
-      var rows = self._convertRows(table, result);
+      var rows = self._fromWebSqlToJsValue(table, result);
       if (_.isFunction(callback)) callback(rows);
     });
 
@@ -162,7 +162,7 @@ Websql.prototype = {
     var query = 'SELECT * FROM '+table+' WHERE id='+id,
         self = this;
     this.query(query, function(tx, res, error) {
-      var result = self._convertRows(table, res);
+      var result = self._fromWebSqlToJsValue(table, res);
       result = result ? result[0] : null;
       if (_.isFunction(callback)) callback(result, error);
     });
@@ -205,7 +205,7 @@ Websql.prototype = {
     this.query(query, function(tx, res, error) {
       var result = [];
       if (cond.row!==true)
-        result = self._convertRows(table, res);
+        result = self._fromWebSqlToJsValue(table, res);
       else {
         if (res && res.rows.length!==0) {
           for(var i = 0; i < res.rows.length; i++) {
@@ -236,7 +236,7 @@ Websql.prototype = {
 
     keys.map(function(key) {
       if (!data[key]) return;
-      vals.push(self._cellData(data[key]));
+      vals.push(self._toWebSQLValue(data[key]));
     });
 
     var query = 'INSERT INTO '+table+' ('+keys.join(', ')+') VALUES ('+vals.join(', ')+')';
@@ -259,7 +259,7 @@ Websql.prototype = {
         if (key==='id') {
           where = 'id='+data[key];
         } else {
-          set.push(key+'='+self._cellData(data[key]));
+          set.push(key+'='+self._toWebSQLValue(data[key]));
         }
       }
     }
