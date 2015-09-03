@@ -2,3 +2,13 @@ node_modules
 vendor
 cordova_project
 .idea
+cordova/www/boot.js
+cordova/www/jasmine.css
+cordova/www/jasmine.js
+cordova/www/jasmine-html.js
+cordova/www/jquery.min.js
+cordova/www/lodash.min.js
+cordova/www/sqlite.js
+cordova/www/test.js
+cordova/platforms
+cordova/plugins

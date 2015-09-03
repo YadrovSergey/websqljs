@@ -41,16 +41,35 @@ gulp.task('server', function() {
     }));
 });
 
+
+gulp.task('copy-to-cordova', function() {
+    gulp.src('./vendor/jquery/dist/jquery.min.js')
+        .pipe(gulp.dest('./cordova/www/jquery.min.js'));
+
+    gulp.src('./vendor/jasmine-core/lib/jasmine-core/jasmine.js')
+        .pipe(gulp.dest('./cordova/www/jasmine.js'));
+
+    gulp.src('./vendor/jasmine-core/lib/jasmine-core/jasmine-html.js')
+        .pipe(gulp.dest('./cordova/www/jasmine-html.js'));
+
+    gulp.src('./vendor/jasmine-core/lib/jasmine-core/boot.js')
+        .pipe(gulp.dest('./cordova/www/boot.js'));
+
+    gulp.src('./vendor/lodash/lodash.min.js')
+        .pipe(gulp.dest('./cordova/www/lodash.min.js'));
+
+    gulp.src('./lib/sqlite.js')
+        .pipe(gulp.dest('./cordova/www/sqlite.js'));
+
+    gulp.src('./spec/test.js')
+        .pipe(gulp.dest('./cordova/www/test.js'));
+
+    gulp.src('./vendor/jasmine-core/lib/jasmine-core/jasmine.css')
+        .pipe(gulp.dest('./cordova/www/jasmine.css'));
+});
+
 gulp.task('watch', function() {
     gulp.watch(['src/sqlite.js'], ['build']);
-    //gulp.watch(['src/sqlite.js'], function(files) {
-    //    //runSequence('build', function(){
-    //    //    console.log('build');
-    //    //    done();
-    //    //});
-    //});
-
-  //gulp.watch('./src/sqlite.js', ['build']);
 });
 
 
