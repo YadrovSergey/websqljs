@@ -121,9 +121,9 @@ Websql.prototype = {
         var query = this._createTableSql(oStructure);
 
 
-        this.query('SELECT * FROM sqlite_master', function(tx, result, error) {
-            console.log(tx, result, error);
-        });
+        //this.query('SELECT * FROM sqlite_master', function(tx, result, error) {
+        //    console.log(tx, result, error);
+        //});
 
         this.query(this._createTableSql(oStructure), function(tx, result, error) {
 
