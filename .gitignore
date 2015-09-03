@@ -12,3 +12,4 @@ cordova/www/sqlite.js
 cordova/www/test.js
 cordova/platforms
 cordova/plugins
+cordova/.idea
