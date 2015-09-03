@@ -1,10 +1,12 @@
 var Websql = function(config) {
+
     if (config.sqlitePlugin) {
         this._db = window.sqlitePlugin.openDatabase(config.name, config.version, config.displayname, config.size);
     } else {
         this._db = openDatabase(config.name, config.version, config.displayname, config.size);
     }
     this.debug = config.debug || false;
+
 };
 
 Websql.prototype = {
@@ -510,5 +512,117 @@ var sqlitejs = {
         }
 
         return this._cache[config.name];
+    },
+
+    /**
+     * @type {Websql}
+     */
+    _db: null,
+
+    /**
+     * Инициализируем БД
+     * @param config
+     * @returns {Websql}
+     */
+    setDB: function(config){
+        this._db = this.openDatabase(config);
+        return this._db;
+    },
+
+    /**
+     * Возвращает ранее инициализированную БД
+     * @returns {Websql}
+     */
+    getDB: function(){
+        return this._db;
+    },
+
+
+    fromObject: function(oSchema, oClass, oObject){
+
+        if(oObject===null){
+            return oClass;
+        }
+        _(oSchema.fields)
+            .forOwn(function(value, key){
+                oClass[key] = oObject[key];
+            }
+        ).value();
+
+        oClass.id = oObject.id;
+        oClass.created_at = oObject.created_at;
+        oClass.updated_at = oObject.updated_at;
+
+        return oClass;
+    },
+
+    toObject: function(oSchema, oClass){
+        var lResult = {};
+        _(oSchema.fields)
+            .forOwn(function(value, key){
+                lResult[key] = oClass[key];
+            }
+        ).value();
+        lResult.id = oClass.id;
+
+        return lResult;
+    },
+
+    save: function(oSchema, oClass, fCallBack){
+
+        this.createTableIfNotExist(oSchema);
+
+        this.getDB().save(oSchema.name,
+            sqlitejs.toObject(oSchema, oClass),
+            function(nId){
+                oClass.id = nId;
+                fCallBack();
+            });
+    },
+
+    byId: function(nId, oSchema, oClass, fCallBack){
+
+        var self = this;
+        self.createTableIfNotExist(oSchema);
+        self.getDB().byId(oSchema.name, nId, function(arResult){
+
+            fCallBack(self.fromObject(oSchema, oClass, arResult));
+
+        });
+
+    },
+
+    byDateAndIdUser: function(nIdUser, nDate, sDateProp, oSchema, oClass, fCallBack){
+
+        var self = this;
+        self.createTableIfNotExist(oSchema);
+
+        var find = {
+            where: [
+                {field: 'id_user', op:'=', value: nIdUser},
+                'and',
+                {field: 'date_of_training', op:'=', value: nDate}
+            ]
+        };
+
+        self.getDB().find(oSchema.name, find, function(arResult){
+            if(arResult===null || arResult.length===0){
+                fCallBack(oClass);
+            }else{
+                fCallBack(self.fromObject(oSchema, oClass, arResult[0]));
+            }
+
+        });
+
+    },
+
+    _createTableIfNotExistCache: {},
+    createTableIfNotExist: function(oSchema, bReCreate){
+        if(this._createTableIfNotExistCache[oSchema.name] === true && bReCreate!==true){
+            return;
+        }
+        this.getDB().createTable(oSchema);
+        this._createTableIfNotExistCache[oSchema.name] = true;
     }
+
 };

@@ -1,4 +1,4 @@
-var db = sqlitejs.openDatabase({
+sqlitejs.setDB({
     name: 'jasmine_test',
     version: '1',
     displayname: 'jasmine_test',
@@ -6,6 +6,8 @@ var db = sqlitejs.openDatabase({
     sqlitePlugin: false,
     debug: true
 });
+
+var db = sqlitejs.getDB();
 
 
 describe('Query tests', function() {
