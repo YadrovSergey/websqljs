@@ -601,7 +601,7 @@ var sqlitejs = {
             where: [
                 {field: 'id_user', op:'=', value: nIdUser},
                 'and',
-                {field: 'date_of_training', op:'=', value: nDate}
+                {field: sDateProp, op:'=', value: nDate}
             ]
         };
 
@@ -610,6 +610,39 @@ var sqlitejs = {
                 fCallBack(oClass);
             }else{
                 fCallBack(self.fromObject(oSchema, oClass, arResult[0]));
+            }
+
+        });
+
+    },
+
+    byPeriodAndIdUser: function(nIdUser, nDateStart, nDateEnd, sDateProp, oSchema, fConstructorClass, fCallBack){
+
+        var self = this;
+        self.createTableIfNotExist(oSchema);
+
+        var find = {
+            where: [
+                {field: 'id_user', op:'=', value: nIdUser},
+                'and',
+                {field: sDateProp, op:'>=', value: nDateStart},
+                'and',
+                {field: sDateProp, op:'<=', value: nDateEnd}
+            ],
+            order: sDateProp
+        };
+
+        self.getDB().find(oSchema.name, find, function(arResult){
+            if(arResult===null || arResult.length===0){
+                fCallBack([]);
+            }else{
+
+                var ar = arResult.map(function(oItem){
+                    var lNew = new fConstructorClass();
+                    return self.fromObject(oSchema, lNew, oItem)
+                });
+
+                fCallBack(ar);
             }
 
         });
