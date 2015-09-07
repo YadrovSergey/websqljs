@@ -569,9 +569,9 @@ var sqlitejs = {
     },
 
     save: function(oSchema, oClass, fCallBack){
-
+        var self = this;
         this.createTableIfNotExist(oSchema, function(){
-            this.getDB().save(oSchema.name,
+            self.getDB().save(oSchema.name,
                 sqlitejs.toObject(oSchema, oClass),
                 function(nId){
                     oClass.id = nId;
