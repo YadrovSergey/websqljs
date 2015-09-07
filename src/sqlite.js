@@ -125,7 +125,7 @@ Websql.prototype = {
         //    console.log(tx, result, error);
         //});
 
-        this.query(this._createTableSql(oStructure), function(tx, result, error) {
+        self.query(this._createTableSql(oStructure), function(tx, result, error) {
 
             // if table already exists
             if (error && error.code===5) {
@@ -157,7 +157,9 @@ Websql.prototype = {
 
                         var lTotal = 0;
                         if(arQueries.length === 0){
-                            callback(tx, result, error);
+                            if(_.isFunction(callback)){
+                                callback(tx, result, error);
+                            }
                         }else{
                             arQueries.forEach(function(sQuery){
                                 self.query(sQuery, function(tx, result, error){
