@@ -73,6 +73,7 @@ Websql.prototype = {
             tx.executeSql(sql, [], function(tx, result) {
                 if (_.isFunction(callback)) callback(tx, result);
             }, function(tx, error) {
+                console.error('WebSQL', sql, error.code, error.message);
                 if (_.isFunction(callback)) callback(tx, null, error);
             });
         });
@@ -316,7 +317,7 @@ Websql.prototype = {
             if (data[key] || data[key]==="" || data[key]===0){
                 keys.push(key);
             } else{
-                console.log(data[key],key ,'!!!!!!!!!!!!!!!!!!!!!!');
+                //console.log(data[key],key );
             }
         });
 
@@ -339,6 +340,9 @@ Websql.prototype = {
 
     insert: function(table, data, callback) {
 
+        if(data.id === 0){
+            data.id = null;
+        }
         var query = this._queryInsert(table, data);
 
         this.query(query, function(tx, res, error) {
