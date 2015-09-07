@@ -590,7 +590,7 @@ var sqlitejs = {
                 sqlitejs.toObject(oSchema, oClass),
                 function(nId){
                     oClass.id = nId;
-                    fCallBack();
+                    fCallBack(oClass);
                 });
         });
 
