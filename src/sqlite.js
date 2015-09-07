@@ -544,7 +544,7 @@ var sqlitejs = {
         return this._db;
     },
 
-
+//todo spec
     fromObject: function(oSchema, oClass, oObject){
 
         if(oObject===null){
@@ -563,7 +563,8 @@ var sqlitejs = {
         return oClass;
     },
 
-    toObject: function(oSchema, oClass){
+//todo spec
+   toObject: function(oSchema, oClass){
         var lResult = {};
         _(oSchema.fields)
             .forOwn(function(value, key){
@@ -574,7 +575,7 @@ var sqlitejs = {
 
         return lResult;
     },
-
+//todo spec
     save: function(oSchema, oClass, fCallBack){
         var self = this;
         this.createTableIfNotExist(oSchema, function(){
@@ -588,7 +589,7 @@ var sqlitejs = {
 
 
     },
-
+//todo spec
     byId: function(nId, oSchema, oClass, fCallBack){
 
         var self = this;
@@ -602,7 +603,7 @@ var sqlitejs = {
         });
 
     },
-
+//todo spec
     byDateAndIdUser: function(nIdUser, nDate, sDateProp, oSchema, oClass, fCallBack){
 
         var self = this;
@@ -628,7 +629,7 @@ var sqlitejs = {
 
 
     },
-
+//todo spec
     byPeriodAndIdUser: function(nIdUser, nDateStart, nDateEnd, sDateProp, oSchema, fConstructorClass, fCallBack){
 
         var self = this;
@@ -664,7 +665,7 @@ var sqlitejs = {
 
     },
 
-
+//todo spec
     isEmpty: function(oSchema, fCallBack){
 
         var self = this;
@@ -673,7 +674,7 @@ var sqlitejs = {
 
             self.getDB().query("SELECT count(id) AS ct FROM " + oSchema.name, function(tx, res, error) {
 
-                if (_.isFunction(callback)){
+                if (_.isFunction(fCallBack)){
                     fCallBack((res && res.rows.length!==0));
                 }
 
@@ -683,7 +684,7 @@ var sqlitejs = {
 
 
     },
-
+//todo spec
     _createTableIfNotExistCache: {},
     createTableIfNotExist: function(oSchema, callback, bReCreate){
         if(this._createTableIfNotExistCache[oSchema.name] === true && bReCreate!==true){
